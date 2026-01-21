@@ -27,12 +27,12 @@ body.dark {
 }
 
 .block-title {
-	font-size: clamp(48px, 12vw, 120px);
+	font-size: clamp(64px, 15vw, 160px);
 	font-weight: 900;
 	margin-bottom: 1rem;
 }
 
 .block-message {
-	font-size: clamp(24px, 6vw, 60px);
+	font-size: clamp(32px, 8vw, 80px);
 	font-weight: 500;
 }

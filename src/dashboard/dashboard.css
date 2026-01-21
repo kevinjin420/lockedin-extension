@@ -9,6 +9,7 @@ body {
 	background: #f8f9fa;
 	color: #212529;
 	min-height: 100vh;
+	font-size: 18px;
 }
 
 body.dark {
@@ -247,6 +248,7 @@ body.dark .website-item {
 .site-url {
 	flex: 1;
 	word-break: break-all;
+	font-size: 1.1rem;
 }
 
 .delete-btn {

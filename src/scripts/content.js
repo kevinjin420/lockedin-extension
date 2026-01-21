@@ -44,9 +44,21 @@ function shouldBlock(url) {
 	return websites.some((entry) => {
 		try {
 			const entryUrl = new URL(entry.includes('://') ? entry : 'https://' + entry);
-			return url === entry || url.startsWith(entry) || location.origin === entryUrl.origin;
+			const entryHost = entryUrl.hostname.replace(/^www\./, '');
+			const currentHost = location.hostname.replace(/^www\./, '');
+			const hostMatches = currentHost === entryHost || currentHost.endsWith('.' + entryHost);
+
+			if (!hostMatches) return false;
+
+			const entryPath = entryUrl.pathname.replace(/\/+$/, '');
+			if (!entryPath || entryPath === '') return true;
+
+			const currentPath = location.pathname.replace(/\/+$/, '');
+			return currentPath === entryPath || currentPath.startsWith(entryPath + '/');
 		} catch {
-			return url.includes(entry);
+			const cleanEntry = entry.replace(/^www\./, '');
+			const currentHost = location.hostname.replace(/^www\./, '');
+			return currentHost === cleanEntry || currentHost.endsWith('.' + cleanEntry);
 		}
 	});
 }
@@ -91,6 +103,15 @@ function handleStorageChange(changes, areaName) {
 	}
 }
 
+let lastUrl = location.href;
+
+function checkUrlChange() {
+	if (location.href !== lastUrl) {
+		lastUrl = location.href;
+		applyBlock();
+	}
+}
+
 function init() {
 	chrome.storage.local.get(['isDarkMode', 'isEnabled', 'websites', 'title', 'message'], (result) => {
 		isDarkMode = result.isDarkMode ?? true;
@@ -108,6 +129,37 @@ function init() {
 	});
 
 	chrome.storage.onChanged.addListener(handleStorageChange);
+
+	chrome.runtime.onMessage.addListener((message) => {
+		if (message.type === 'checkBlock') {
+			chrome.storage.local.get(['isDarkMode', 'isEnabled', 'websites', 'title', 'message'], (result) => {
+				isDarkMode = result.isDarkMode ?? true;
+				isEnabled = result.isEnabled ?? true;
+				config.title = result.title ?? '';
+				config.message = result.message ?? '';
+				try {
+					websites = JSON.parse(result.websites || '[]');
+				} catch {
+					websites = [];
+				}
+				applyBlock();
+			});
+		}
+	});
+
+	const originalPushState = history.pushState;
+	const originalReplaceState = history.replaceState;
+	history.pushState = function(...args) {
+		originalPushState.apply(this, args);
+		checkUrlChange();
+	};
+	history.replaceState = function(...args) {
+		originalReplaceState.apply(this, args);
+		checkUrlChange();
+	};
+	window.addEventListener('popstate', checkUrlChange);
+
+	setInterval(checkUrlChange, 500);
 }
 
 window.addEventListener('beforeunload', () => {
