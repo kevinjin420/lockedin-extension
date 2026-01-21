@@ -1,0 +1,9 @@
+{
+	"name": "lockedin-extension",
+	"version": "1.4.0",
+	"description": "Simple website blocker to improve focus and productivity",
+	"private": true,
+	"scripts": {
+		"build": "rm -rf dist && mkdir -p dist/src && cp -r public/* dist/ && cp -r src/* dist/src/"
+	}
+}

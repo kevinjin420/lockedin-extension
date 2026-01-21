@@ -1,0 +1,32 @@
+{
+	"name": "LockedIn Site Blocker",
+	"description": "Simple website blocker to improve focus and productivity",
+	"version": "1.4",
+	"manifest_version": 3,
+	"options_page": "src/dashboard/dashboard.html",
+	"action": {
+		"default_popup": "src/popup/popup.html",
+		"default_icon": "logo-transparent.png"
+	},
+	"icons": {
+		"16": "logo-16.png",
+		"32": "logo-32.png",
+		"48": "logo-48.png",
+		"128": "logo-128.png"
+	},
+	"host_permissions": ["<all_urls>"],
+	"permissions": ["storage"],
+	"web_accessible_resources": [
+		{
+			"resources": ["src/block/block.css"],
+			"matches": ["<all_urls>"]
+		}
+	],
+	"content_scripts": [
+		{
+			"matches": ["<all_urls>"],
+			"js": ["src/scripts/content.js"],
+			"run_at": "document_start"
+		}
+	]
+}

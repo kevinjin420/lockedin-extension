@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>LockedIn Settings</title>
+	<link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+	<div class="wrapper">
+		<div class="container">
+			<div class="header">
+				<div class="toggle-wrapper">
+					<span id="disabledLabel" class="toggle-label">Disabled</span>
+					<label class="switch">
+						<input type="checkbox" id="enabledSwitch">
+						<span class="slider"></span>
+					</label>
+					<span id="enabledLabel" class="toggle-label">Locked In</span>
+				</div>
+				<button id="themeBtn" class="icon-btn" title="Toggle theme"></button>
+			</div>
+
+			<section class="section">
+				<h3>Customize Block Page</h3>
+				<form id="messageForm">
+					<input type="text" id="titleInput" placeholder="Block Title (e.g., Page Blocked)">
+					<input type="text" id="messageInput" placeholder="Block Message (e.g., Stay Focused!)">
+					<div class="form-footer">
+						<span id="unsavedIndicator" class="unsaved hidden">Unsaved changes</span>
+						<button type="submit" class="btn btn-success">Save Message</button>
+					</div>
+				</form>
+			</section>
+
+			<section class="section">
+				<h3>URLs to Block</h3>
+				<form id="urlForm" class="url-form">
+					<input type="text" id="urlInput" placeholder="Enter a website (e.g., tiktok.com)">
+					<button type="submit" class="btn btn-primary">Add</button>
+				</form>
+				<ul id="websiteList" class="website-list"></ul>
+			</section>
+		</div>
+	</div>
+	<script src="dashboard.js"></script>
+</body>
+</html>
