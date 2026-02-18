@@ -3,6 +3,9 @@ let isEnabled = true;
 let websites = [];
 let config = { title: '', message: '' };
 
+document.documentElement.style.visibility = 'hidden';
+document.documentElement.style.opacity = '0';
+
 function blockPage() {
 	window.stop();
 
@@ -11,7 +14,14 @@ function blockPage() {
 		<head>
 			<meta charset="UTF-8">
 			<title>Blocked</title>
-			<link rel="stylesheet" href="${chrome.runtime.getURL('src/block/block.css')}">
+			<style>
+				* { margin: 0; padding: 0; box-sizing: border-box; }
+				body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8f9fa; color: #212529; }
+				body.dark { background: #1c1c1c; color: #fff; }
+				.block-overlay { width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 2rem; }
+				.block-title { font-size: clamp(64px, 15vw, 160px); font-weight: 900; margin-bottom: 1rem; }
+				.block-message { font-size: clamp(32px, 8vw, 80px); font-weight: 500; }
+			</style>
 		</head>
 		<body class="${isDarkMode ? 'dark' : ''}">
 			<div class="block-overlay">
@@ -63,10 +73,16 @@ function shouldBlock(url) {
 	});
 }
 
+function showPage() {
+	document.documentElement.style.visibility = '';
+	document.documentElement.style.opacity = '';
+}
+
 function applyBlock() {
 	if (isEnabled && shouldBlock(location.href)) {
 		blockPage();
 	} else {
+		showPage();
 		unblockPage();
 	}
 }
