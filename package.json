@@ -4,6 +4,7 @@
 	"description": "Simple website blocker to improve focus and productivity",
 	"private": true,
 	"scripts": {
-		"build": "rm -rf dist && mkdir -p dist/src && cp -r public/* dist/ && cp -r src/* dist/src/"
+		"build": "rm -rf dist && mkdir -p dist/src && cp -r public/* dist/ && cp -r src/* dist/src/",
+		"release": "npm run build && cd dist && zip -r ../ext.zip ."
 	}
 }

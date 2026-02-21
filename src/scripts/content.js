@@ -2,11 +2,16 @@ let isDarkMode = true;
 let isEnabled = true;
 let websites = [];
 let config = { title: '', message: '' };
+let blocked = false;
 
-document.documentElement.style.visibility = 'hidden';
-document.documentElement.style.opacity = '0';
+const hideSheet = document.createElement('style');
+hideSheet.textContent = 'html { visibility: hidden !important; opacity: 0 !important; }';
+document.documentElement.appendChild(hideSheet);
 
 function blockPage() {
+	if (blocked) return;
+	blocked = true;
+
 	window.stop();
 
 	document.documentElement.innerHTML = `
@@ -45,8 +50,8 @@ function escapeHtml(str) {
 }
 
 function unblockPage() {
-	const overlay = document.querySelector('.block-overlay');
-	if (!overlay) return;
+	if (!blocked) return;
+	blocked = false;
 	location.reload();
 }
 
@@ -74,8 +79,7 @@ function shouldBlock(url) {
 }
 
 function showPage() {
-	document.documentElement.style.visibility = '';
-	document.documentElement.style.opacity = '';
+	hideSheet.remove();
 }
 
 function applyBlock() {
@@ -90,15 +94,17 @@ function applyBlock() {
 function handleStorageChange(changes, areaName) {
 	if (areaName !== 'local') return;
 
+	let needsRecheck = false;
+
 	if (changes.isEnabled) {
 		isEnabled = changes.isEnabled.newValue;
-		applyBlock();
+		needsRecheck = true;
 	}
 
 	if (changes.isDarkMode) {
 		isDarkMode = changes.isDarkMode.newValue;
-		if (document.querySelector('.block-overlay')) {
-			document.body.classList.toggle('dark', isDarkMode);
+		if (blocked) {
+			document.body?.classList.toggle('dark', isDarkMode);
 		}
 	}
 
@@ -108,7 +114,7 @@ function handleStorageChange(changes, areaName) {
 		} catch {
 			websites = [];
 		}
-		applyBlock();
+		needsRecheck = true;
 	}
 
 	if (changes.title) {
@@ -116,6 +122,10 @@ function handleStorageChange(changes, areaName) {
 	}
 	if (changes.message) {
 		config.message = changes.message.newValue;
+	}
+
+	if (needsRecheck) {
+		applyBlock();
 	}
 }
 
@@ -148,18 +158,7 @@ function init() {
 
 	chrome.runtime.onMessage.addListener((message) => {
 		if (message.type === 'checkBlock') {
-			chrome.storage.local.get(['isDarkMode', 'isEnabled', 'websites', 'title', 'message'], (result) => {
-				isDarkMode = result.isDarkMode ?? true;
-				isEnabled = result.isEnabled ?? true;
-				config.title = result.title ?? '';
-				config.message = result.message ?? '';
-				try {
-					websites = JSON.parse(result.websites || '[]');
-				} catch {
-					websites = [];
-				}
-				applyBlock();
-			});
+			applyBlock();
 		}
 	});
 
