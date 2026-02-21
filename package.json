@@ -4,7 +4,7 @@
 	"description": "Simple website blocker to improve focus and productivity",
 	"private": true,
 	"scripts": {
-		"build": "rm -rf dist && mkdir -p dist/src && cp -r public/* dist/ && cp -r src/* dist/src/",
-		"release": "npm run build && cd dist && zip -r ../ext.zip ."
+		"build": "rm -rf dist && mkdir -p dist/src && cp -r public/* dist/ && cp -r src/* dist/src/ && node -e \"const m=require('./dist/manifest.json');const p=require('./package.json');m.version=p.version;require('fs').writeFileSync('./dist/manifest.json',JSON.stringify(m,null,'\t')+'\\n')\"",
+		"release": "npm run build && rm -f ext.zip && cd dist && zip -r ../ext.zip ."
 	}
 }
