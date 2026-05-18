@@ -51,31 +51,34 @@ function renderWebsites() {
 }
 
 function syncWebsites() {
-	chrome.storage.local.set({ websites: JSON.stringify(websites) });
+	chrome.storage.sync.set({ websites: JSON.stringify(websites) });
 }
 
-chrome.storage.local.get(['isDarkMode', 'isEnabled', 'websites', 'title', 'message'], (result) => {
-	isDarkMode = result.isDarkMode ?? true;
-	isEnabled = result.isEnabled ?? true;
-	titleInput.value = result.title ?? '';
-	messageInput.value = result.message ?? '';
-	savedTitle = titleInput.value;
-	savedMessage = messageInput.value;
+chrome.storage.local.get(['isDarkMode', 'isEnabled'], (localResult) => {
+	isDarkMode = localResult.isDarkMode ?? true;
+	isEnabled = localResult.isEnabled ?? true;
 
-	try {
-		websites = JSON.parse(result.websites || '[]');
-	} catch {
-		websites = [];
-	}
+	chrome.storage.sync.get(['websites', 'title', 'message'], (syncResult) => {
+		titleInput.value = syncResult.title ?? '';
+		messageInput.value = syncResult.message ?? '';
+		savedTitle = titleInput.value;
+		savedMessage = messageInput.value;
 
-	updateThemeUI();
-	updateEnabledUI();
-	renderWebsites();
-	urlInput.focus();
+		try {
+			websites = JSON.parse(syncResult.websites || '[]');
+		} catch {
+			websites = [];
+		}
+
+		updateThemeUI();
+		updateEnabledUI();
+		renderWebsites();
+		urlInput.focus();
+	});
 });
 
 chrome.storage.onChanged.addListener((changes, areaName) => {
-	if (areaName !== 'local') return;
+	if (areaName !== 'local' && areaName !== 'sync') return;
 
 	if (changes.isDarkMode) {
 		isDarkMode = changes.isDarkMode.newValue;
@@ -114,7 +117,7 @@ messageInput.addEventListener('input', checkDirty);
 
 messageForm.addEventListener('submit', (e) => {
 	e.preventDefault();
-	chrome.storage.local.set({
+	chrome.storage.sync.set({
 		title: titleInput.value,
 		message: messageInput.value
 	});

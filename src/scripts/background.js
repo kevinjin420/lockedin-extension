@@ -1,5 +1,5 @@
 chrome.storage.onChanged.addListener((changes, areaName) => {
-	if (areaName !== 'local') return;
+	if (areaName !== 'local' && areaName !== 'sync') return;
 	if (changes.isEnabled || changes.websites) {
 		chrome.tabs.query({}, (tabs) => {
 			tabs.forEach((tab) => {

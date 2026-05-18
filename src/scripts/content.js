@@ -92,7 +92,7 @@ function applyBlock() {
 }
 
 function handleStorageChange(changes, areaName) {
-	if (areaName !== 'local') return;
+	if (areaName !== 'local' && areaName !== 'sync') return;
 
 	let needsRecheck = false;
 
@@ -139,19 +139,22 @@ function checkUrlChange() {
 }
 
 function init() {
-	chrome.storage.local.get(['isDarkMode', 'isEnabled', 'websites', 'title', 'message'], (result) => {
-		isDarkMode = result.isDarkMode ?? true;
-		isEnabled = result.isEnabled ?? true;
-		config.title = result.title ?? '';
-		config.message = result.message ?? '';
+	chrome.storage.local.get(['isDarkMode', 'isEnabled'], (localResult) => {
+		isDarkMode = localResult.isDarkMode ?? true;
+		isEnabled = localResult.isEnabled ?? true;
 
-		try {
-			websites = JSON.parse(result.websites || '[]');
-		} catch {
-			websites = [];
-		}
+		chrome.storage.sync.get(['websites', 'title', 'message'], (syncResult) => {
+			config.title = syncResult.title ?? '';
+			config.message = syncResult.message ?? '';
 
-		applyBlock();
+			try {
+				websites = JSON.parse(syncResult.websites || '[]');
+			} catch {
+				websites = [];
+			}
+
+			applyBlock();
+		});
 	});
 
 	chrome.storage.onChanged.addListener(handleStorageChange);
